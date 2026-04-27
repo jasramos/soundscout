@@ -1,0 +1,9 @@
+{
+    "MySQL": {
+
+        "username": "soun_final",
+        "password": "Bc1tt7vCA3qa6bbg",
+        "database": "soun_final",
+        "dialect": "mysql"
+    }
+}
