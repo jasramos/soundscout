@@ -1,4 +1,4 @@
-module.exports = function(sequelize, Sequelize) {
+module.exports = function (sequelize, Sequelize) {
     let User = sequelize.define('user', {
         id: { autoIncrement: true, primaryKey: true, type: Sequelize.INTEGER },
         nome: { type: Sequelize.STRING, allowNull: false },
@@ -8,7 +8,7 @@ module.exports = function(sequelize, Sequelize) {
         cargo: { type: Sequelize.STRING, allowNull: false },
         last_login: { type: Sequelize.DATE },
         status: { type: Sequelize.ENUM('active', 'inactive'), defaultValue: 'active' }
-        
+
     });
     return User;
 }

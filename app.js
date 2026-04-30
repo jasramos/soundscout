@@ -47,9 +47,9 @@ app.get('', (req, res) => {
 })
 
 var options = {
-  user: 'soun_final',
-  password: 'Bc1tt7vCA3qa6bbg',
-  database: 'soun_final'
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME
 };
 
 var sessionStore = new MySQLStore(options);
