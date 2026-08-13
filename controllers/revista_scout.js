@@ -109,6 +109,10 @@ exports.readID = function (req, res) {
 
 exports.save_capa = function (req, res) {
 
+    if (!req.file) {
+        console.error('save_capa (scout): no file received - upload was rejected before multer');
+        return res.status(400).send({ "msg": "no file received" });
+    }
     const capa = req.file.path;
     var query = "";
 

@@ -17,9 +17,32 @@ const multer = require('multer');
 const path = require('path');
 var count = 1;
 
+// Absolute, so uploads land next to the app files no matter what the
+// process working directory is (differs between local and the host).
+const UPLOAD_DIR = path.join(__dirname, '..', 'public', 'imagens');
+
+// The DB stores the relative form (`public/imagens/<file>`) and the reads
+// strip it with SUBSTRING(capa, 8), so keep req.file.path relative even
+// though the file is written to the absolute path above.
+const relativeTo = (storage) => ({
+    _handleFile(req, file, cb) {
+        storage._handleFile(req, file, (err, info) => {
+            if (err) return cb(err);
+            cb(null, Object.assign({}, info, {
+                path: `public/imagens/${info.filename}`
+            }));
+        });
+    },
+    _removeFile(req, file, cb) {
+        storage._removeFile(req, Object.assign({}, file, {
+            path: path.join(UPLOAD_DIR, file.filename)
+        }), cb);
+    }
+});
+
 //FOTOS
 const storage = multer.diskStorage({
-    destination: './public/imagens/',
+    destination: UPLOAD_DIR,
     filename: (req, file, cb) => {
         return cb(null, `${file.fieldname}_${file.originalname}`)
     }
@@ -27,20 +50,20 @@ const storage = multer.diskStorage({
 count++;
 
 const upload = multer({
-    storage: storage
+    storage: relativeTo(storage)
 
 })
 
 
 //ALBUM
 const storage2 = multer.diskStorage({
-    destination: './public/imagens/',
+    destination: UPLOAD_DIR,
     filename: (req, file, cb) => {
         return cb(null, `${file.fieldname}_${Date.now()}_${file.originalname}`)
     }
 })
 const upload2 = multer({
-    storage: storage2
+    storage: relativeTo(storage2)
 
 })
 
@@ -161,6 +184,13 @@ router.get('/quiz/:id', Quiz.readID);
 router.post('/quiz/', Quiz.save);
 router.put('/quiz/:id', Quiz.update);
 router.delete('/quiz/:id', Quiz.deleteID);
+
+// Upload failures (write permissions, size limits) otherwise die silently
+// as a generic 500 with nothing in the log.
+router.use(function (err, req, res, next) {
+    console.error(`upload error on ${req.method} ${req.originalUrl}:`, err);
+    res.status(400).send({ "msg": err.code || err.message });
+});
 
 module.exports = router;
 
