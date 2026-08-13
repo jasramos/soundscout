@@ -1,0 +1,7 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/soundsco/repositories/soundscout/
+    - /bin/bash -c "source /home/soundsco/nodevenv/repositories/soundscout/18/bin/activate && cd $DEPLOYPATH && npm install --production"
+    - mkdir -p $DEPLOYPATH/tmp
+    - touch $DEPLOYPATH/tmp/restart.txt
